@@ -1,5 +1,14 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
+const { ipcMain } = require('electron')
+const util = require('util')
+const fs = require('fs')
+
+// listen for files event by browser process
+const stat = util.promisify(fs.stat)
+
+
+
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -20,7 +29,28 @@ const createWindow = () => {
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
   // Open the DevTools.
-  //mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
+
+
+  // comunication with renderer processes
+  ipcMain.on('files',async (event,fileArr) => {
+    try {
+        //synchronously get the data for all the files
+        const data = await Promise.all(
+          fileArr.map(async({ name, pathName }) => ({
+            ...await stat(pathName),
+            name,
+            pathName,
+
+          }))
+        )
+        console.log('data prom main process', data)
+        mainWindow.webContents.send('metadata', data)
+    } catch (error) {
+      mainWindow.webContents.send('metadata:error', error)
+    }
+  })
+
 };
 
 // This method will be called when Electron has finished
@@ -47,3 +77,7 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+
+
+
+

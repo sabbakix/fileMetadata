@@ -3,10 +3,24 @@
   <head>
     <meta charset="UTF-8">
     <title>File Metadata</title>
+    <!--meta http-equiv="Content-Security-Policy" content="default-src 'none'"-->
     <link rel="stylesheet" href="index.css">
   </head>
   <body>
     <h1>File Metadata</h1>
     <p>file metadata details</p>
+    <form>
+      <div>
+        <label for="filepicker">
+          <input id="filePicker" name="filepicker" type="file" multiple />
+        </label>
+      </div>
+      <button>Get Metadata</button>
+    </form>
+
+    <hr />
+    <pre id="data"></pre>
+
+    <script src="./renderer.js"></script>
   </body>
 </html>
