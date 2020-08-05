@@ -2,7 +2,7 @@ const { ipcRenderer } = require("electron")
 
 const submitListener = document
     .querySelector('form')
-    .addEventListener('submit',(event) => {
+    .addEventListener('change',(event) => {
         //prevent default behavior that causes page refresh
         event.preventDefault()
 
@@ -13,7 +13,7 @@ const submitListener = document
         //format the file data to only path and name
         const filesFormated = files.map( ({name,path:pathName}) => ({name,pathName}) )
 
-        console.log('filesFormated from renderer process',filesFormated)
+        //console.log('filesFormated from renderer process',filesFormated)
 
         ipcRenderer.send('files',filesFormated)
     })

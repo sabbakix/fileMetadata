@@ -7,8 +7,15 @@ const fs = require('fs')
 // listen for files event by browser process
 const stat = util.promisify(fs.stat)
 
+// crypto utils
+const crypto = require('crypto');
 
-
+function generateChecksum(str, algorithm, encoding) {
+  return crypto
+      .createHash(algorithm || 'sha256')
+      .update(str, 'utf8')
+      .digest(encoding || 'hex');
+}
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -29,23 +36,36 @@ const createWindow = () => {
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
-
+  //mainWindow.webContents.openDevTools();
 
   // comunication with renderer processes
   ipcMain.on('files',async (event,fileArr) => {
+
+    //console.log('filearr',fileArr)
     try {
         //synchronously get the data for all the files
-        const data = await Promise.all(
+        var data = await Promise.all(
           fileArr.map(async({ name, pathName }) => ({
             ...await stat(pathName),
             name,
-            pathName,
-
+            pathName
           }))
         )
-        console.log('data prom main process', data)
-        mainWindow.webContents.send('metadata', data)
+
+        for (var i=0 in data){
+          data[i].notes="hello"+i
+          console.log('1',data[i].name)
+
+          fs.readFile(pathNamex=data[i].pathName,function(err, datax) {
+              console.log('1',this.pathNamex)
+              var checksum = generateChecksum(datax);
+              data[i].notes= `sha256: ${checksum.toString()}`
+              console.log('checksum %s file %s',checksum,data[i].name)
+              mainWindow.webContents.send('metadata', data)
+            })
+
+        }
+        
     } catch (error) {
       mainWindow.webContents.send('metadata:error', error)
     }
