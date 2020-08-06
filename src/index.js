@@ -25,8 +25,8 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1000,
+    height: 800,
     webPreferences:{
       nodeIntegration: true
     }
@@ -46,24 +46,33 @@ const createWindow = () => {
         //synchronously get the data for all the files
         var data = await Promise.all(
           fileArr.map(async({ name, pathName }) => ({
-            ...await stat(pathName),
+            //...await stat(pathName),
             name,
             pathName
           }))
         )
 
         for (var i=0 in data){
-          data[i].notes="hello"+i
-          console.log('1',data[i].name)
-
           fs.readFile(pathNamex=data[i].pathName,function(err, datax) {
-              console.log('1',this.pathNamex)
-              var checksum = generateChecksum(datax);
-              data[i].notes= `sha256: ${checksum.toString()}`
-              console.log('checksum %s file %s',checksum,data[i].name)
+            var checksum_md4 = generateChecksum(datax,'md4');
+            data[i].md4= checksum_md4.toString()
+            var checksum_md5 = generateChecksum(datax,'md5');
+            data[i].md5= checksum_md5.toString()  
+            var checksum_sha1 = generateChecksum(datax,'sha1');
+            data[i].sha1= checksum_sha1.toString()
+            var checksum_sha256 = generateChecksum(datax,'sha256');
+            data[i].sha256= checksum_sha256.toString()
+            //var checksum_sha512 = generateChecksum(datax,'sha512');
+            //data[i].sha512= checksum_sha512.toString()
+            //double sha256 
+            var checksum_sha256_2 = generateChecksum(checksum_sha256,'sha256');
+            data[i].sha256_2= checksum_sha256_2.toString()
+
+            
+            
+              
               mainWindow.webContents.send('metadata', data)
             })
-
         }
         
     } catch (error) {
