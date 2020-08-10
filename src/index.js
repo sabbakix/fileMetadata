@@ -26,7 +26,7 @@ const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1000,
-    height: 800,
+    height: 500,
     webPreferences:{
       nodeIntegration: true
     }
@@ -68,8 +68,6 @@ const createWindow = () => {
             var checksum_sha256_2 = generateChecksum(checksum_sha256,'sha256');
             data[i].sha256_2= checksum_sha256_2.toString()
 
-            
-            
               
               mainWindow.webContents.send('metadata', data)
             })
